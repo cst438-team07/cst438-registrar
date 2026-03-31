@@ -11,13 +11,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import com.cst438.domain.*;
-import com.cst438.dto.*;
-import com.cst438.service.GradebookServiceProxy;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -27,15 +24,9 @@ import com.cst438.domain.SectionRepository;
 import com.cst438.dto.LoginDTO;
 import com.cst438.dto.SectionDTO;
 import com.cst438.service.GradebookServiceProxy;
-import java.util.Random;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@WithMockUser(username = "admin@csumb.edu", authorities = {"SCOPE_ROLE_ADMIN"})
 public class SectionControllerUnitTest {
 
     @Autowired
