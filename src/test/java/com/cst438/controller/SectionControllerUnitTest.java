@@ -1,6 +1,5 @@
 package com.cst438.controller;
 
-<<<<<<< HEAD
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,12 +11,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-=======
 import com.cst438.domain.*;
 import com.cst438.dto.*;
 import com.cst438.service.GradebookServiceProxy;
 import org.junit.jupiter.api.Test;
->>>>>>> 30603bb011ee7831607b8ab6995991b0b961614f
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -25,13 +22,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-<<<<<<< HEAD
 import com.cst438.domain.Section;
 import com.cst438.domain.SectionRepository;
 import com.cst438.dto.LoginDTO;
 import com.cst438.dto.SectionDTO;
 import com.cst438.service.GradebookServiceProxy;
-=======
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,7 +34,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
->>>>>>> 30603bb011ee7831607b8ab6995991b0b961614f
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SectionControllerUnitTest {
