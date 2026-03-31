@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 create table if not exists term (
+=======
+create table term (
+>>>>>>> 30603bb011ee7831607b8ab6995991b0b961614f
     term_id  int primary key,
     tyear     int not null check (tyear between 2000 and 2030),
     semester varchar(10) not null check (semester in ('Spring', 'Fall')),
@@ -9,15 +13,25 @@ create table if not exists term (
     end_date Date not null
 );
 
+<<<<<<< HEAD
 create table if not exists course (
+=======
+create table course (
+>>>>>>> 30603bb011ee7831607b8ab6995991b0b961614f
     course_id varchar(10) primary key,
     title varchar(100) not null,
     credits int not null check (credits >= 0)
 );
 
+<<<<<<< HEAD
 create sequence if not exists sec_seq START WITH 1000;
 
 create table if not exists section (
+=======
+create sequence sec_seq START WITH 1000;
+
+create table section (
+>>>>>>> 30603bb011ee7831607b8ab6995991b0b961614f
     section_no int default next value for sec_seq  primary key,
     course_id varchar(10) not null,
     section_id int not null not null,
@@ -30,9 +44,15 @@ create table if not exists section (
     foreign key(term_id) references term(term_id)
 );
 
+<<<<<<< HEAD
 create sequence if not exists user_seq START WITH 7000;
 
 create table if not exists user_table (
+=======
+create sequence user_seq START WITH 7000;
+
+create table user_table (
+>>>>>>> 30603bb011ee7831607b8ab6995991b0b961614f
 	id integer  default next value for user_seq primary key,
     name varchar(50) not null,
     email varchar(50) not null unique,
@@ -40,9 +60,15 @@ create table if not exists user_table (
     type varchar(10) not null  check (type in ('STUDENT', 'ADMIN', 'INSTRUCTOR'))
 );
 
+<<<<<<< HEAD
 create sequence if not exists enroll_seq START WITH 10000;
 
 create table if not exists enrollment (
+=======
+create sequence enroll_seq START WITH 10000;
+
+create table enrollment (
+>>>>>>> 30603bb011ee7831607b8ab6995991b0b961614f
     enrollment_id integer default next value for enroll_seq primary key,
     grade varchar(5),
     section_no int not null,

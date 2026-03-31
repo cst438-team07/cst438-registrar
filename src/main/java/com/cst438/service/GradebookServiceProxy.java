@@ -1,16 +1,25 @@
 package com.cst438.service;
 
+<<<<<<< HEAD
+=======
+import com.cst438.domain.*;
+import com.cst438.dto.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+>>>>>>> 30603bb011ee7831607b8ab6995991b0b961614f
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
 import com.cst438.domain.Enrollment;
 import com.cst438.domain.EnrollmentRepository;
 import com.cst438.dto.EnrollmentDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+=======
+>>>>>>> 30603bb011ee7831607b8ab6995991b0b961614f
 @Service
 public class GradebookServiceProxy {
 
