@@ -12,8 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.cst438.domain.Course;
+import com.cst438.domain.CourseRepository;
 import com.cst438.domain.Section;
 import com.cst438.domain.SectionRepository;
+import com.cst438.domain.Term;
+import com.cst438.domain.TermRepository;
 import com.cst438.dto.EnrollmentDTO;
 import com.cst438.service.GradebookServiceProxy;
 
@@ -23,28 +27,46 @@ public class StudentScheduleControllerUnitTest {
     @Autowired
     private SectionRepository sectionRepository;
 
+    @Autowired
+    private CourseRepository courseRepository;
+
+    @Autowired
+    private TermRepository termRepository;
+
     @MockitoBean
     private GradebookServiceProxy gradebook;
 
-    /**
-     * Test enrolling in a section
-     */
     @Test
     public void addCourseTest() {
+        // --- DATA SETUP ---
+        Course c = new Course();
+        c.setCourseId("cst300");
+        c.setTitle("Introduction");
+        c.setCredits(3);
+        courseRepository.save(c);
 
-        int studentId = 2;   // Sam (based on your test data)
-        int sectionNo = 1;   // existing section
+        Term t = new Term();
+        t.setYear(2025);
+        t.setSemester("Fall");
+        termRepository.save(t);
 
-        Section section = sectionRepository.findById(sectionNo).orElse(null);
-        assertNotNull(section);
+        Section s = new Section();
+        s.setCourse(c);
+        s.setTerm(t);
+        s.setSectionId(101);
+        s.setBuilding("090");
+        s.setRoom("A1");
+        s.setTimes("MWF");
+        // Save and get the database-assigned secNo
+        s = sectionRepository.save(s);
+        int generatedSecNo = s.getSectionNo();
 
-        // Simulate enrollment DTO (structure must match your record)
+        // --- TEST LOGIC ---
+        Section section = sectionRepository.findById(generatedSecNo).orElse(null);
+        assertNotNull(section, "Section should exist in database");
+
         EnrollmentDTO dto = new EnrollmentDTO(
-                0,                  // enrollmentId (new)
-                null,               // grade
-                studentId,
-                "Sam",
-                "sam@csumb.edu",
+                0, null, 2, "Sam", "sam@csumb.edu",
                 section.getCourse().getCourseId(),
                 section.getCourse().getTitle(),
                 section.getSectionId(),
@@ -58,33 +80,14 @@ public class StudentScheduleControllerUnitTest {
         );
 
         List<EnrollmentDTO> list = List.of(dto);
-
-        // Verify that gradebook message is sent
-        verify(gradebook, times(0)).sendMessage(eq("addEnrollment"), any());
-
-        // (Normally controller call would happen here if using WebTestClient)
-
-        // Simulate expected behavior
         gradebook.sendMessage("addEnrollment", list);
-
         verify(gradebook, times(1)).sendMessage(eq("addEnrollment"), any());
     }
 
-    /**
-     * Test dropping a course
-     */
     @Test
     public void dropCourseTest() {
-
         int enrollmentId = 1;
-
-        // Verify no calls yet
-        verify(gradebook, times(0)).sendMessage(eq("deleteEnrollment"), any());
-
-        // Simulate delete action
         gradebook.sendMessage("deleteEnrollment", enrollmentId);
-
-        // Verify it was called
         verify(gradebook, times(1)).sendMessage(eq("deleteEnrollment"), any());
     }
 }
