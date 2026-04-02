@@ -15,6 +15,7 @@
 	<description>cst438 assignment 2</description>
 	<properties>
 		<java.version>21</java.version>
+		<net.bytebuddy.experimental>true</net.bytebuddy.experimental>
 	</properties>
 	<dependencies>
 		<dependency>
