@@ -1,5 +1,6 @@
 package com.cst438.controller;
 
+import java.sql.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,9 +46,21 @@ public class StudentScheduleControllerUnitTest {
         c.setCredits(3);
         courseRepository.save(c);
 
+        // Term requires specific non-null dates per schema.sql
         Term t = new Term();
-        t.setYear(2025);
+        t.setTermId(20251); // Added a primary key
+        t.setYear(2025);  
         t.setSemester("Fall");
+        
+        // Satisfy "NOT NULL" constraints for Date columns
+        long now = System.currentTimeMillis();
+        Date today = new Date(now);
+        t.setAddDate(today);
+        t.setAddDeadline(today);
+        t.setDropDeadline(today);
+        t.setStartDate(today);
+        t.setEndDate(today);
+        
         termRepository.save(t);
 
         Section s = new Section();
@@ -57,6 +70,7 @@ public class StudentScheduleControllerUnitTest {
         s.setBuilding("090");
         s.setRoom("A1");
         s.setTimes("MWF");
+        
         // Save and get the database-assigned secNo
         s = sectionRepository.save(s);
         int generatedSecNo = s.getSectionNo();
