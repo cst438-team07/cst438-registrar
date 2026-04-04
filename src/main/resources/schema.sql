@@ -1,3 +1,4 @@
+create table if not exists term (
 create table term (
     term_id  int primary key,
     tyear     int not null check (tyear between 2000 and 2030),
@@ -9,12 +10,16 @@ create table term (
     end_date Date not null
 );
 
+create table if not exists course (
 create table course (
     course_id varchar(10) primary key,
     title varchar(100) not null,
     credits int not null check (credits >= 0)
 );
 
+create sequence if not exists sec_seq START WITH 1000;
+
+create table if not exists section (
 create sequence sec_seq START WITH 1000;
 
 create table section (
@@ -30,6 +35,9 @@ create table section (
     foreign key(term_id) references term(term_id)
 );
 
+create sequence if not exists user_seq START WITH 7000;
+
+create table if not exists user_table (
 create sequence user_seq START WITH 7000;
 
 create table user_table (
@@ -40,6 +48,9 @@ create table user_table (
     type varchar(10) not null  check (type in ('STUDENT', 'ADMIN', 'INSTRUCTOR'))
 );
 
+create sequence if not exists enroll_seq START WITH 10000;
+
+create table if not exists enrollment (
 create sequence enroll_seq START WITH 10000;
 
 create table enrollment (
