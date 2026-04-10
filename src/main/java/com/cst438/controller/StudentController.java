@@ -13,25 +13,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.cst438.domain.Enrollment;
 import com.cst438.domain.EnrollmentRepository;
-import com.cst438.domain.User;
-import com.cst438.domain.UserRepository;
 import com.cst438.dto.EnrollmentDTO;
 
 @RestController
 public class StudentController {
 
     private final EnrollmentRepository enrollmentRepository;
-    private final UserRepository userRepository;
 
-    public StudentController(
-            EnrollmentRepository enrollmentRepository,
-            UserRepository userRepository
-    ) {
+    public StudentController(EnrollmentRepository enrollmentRepository) {
         this.enrollmentRepository = enrollmentRepository;
-        this.userRepository = userRepository;
     }
 
-    // retrieve schedule for student for a term
     @GetMapping("/enrollments")
     @PreAuthorize("hasAuthority('SCOPE_ROLE_STUDENT')")
     public List<EnrollmentDTO> getSchedule(
@@ -39,66 +31,62 @@ public class StudentController {
             @RequestParam("semester") String semester,
             Principal principal) {
 
-        User student = userRepository.findByEmail(principal.getName());
-        if (student == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "student not found");
-        }
+        if (principal == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 
-        List<Enrollment> enrollments =
-                enrollmentRepository.findEnrollmentsByStudentIdOrderByTermId(student.getId());
-
+        List<Enrollment> enrollments = enrollmentRepository.findByEmail(principal.getName());
         List<EnrollmentDTO> result = new ArrayList<>();
 
-        for (Enrollment e : enrollments) {
-            if (e.getSection().getTerm().getYear() == year &&
-                e.getSection().getTerm().getSemester().equals(semester)) {
-
-                result.add(convertToDTO(e));
+        if (enrollments != null) {
+            for (Enrollment e : enrollments) {
+                try {
+                    if (e.getSection() != null && e.getSection().getTerm() != null) {
+                        if (e.getSection().getTerm().getYear() == year &&
+                            semester.equals(e.getSection().getTerm().getSemester())) {
+                            result.add(convertToDTO(e));
+                        }
+                    }
+                } catch (Exception ex) {
+                    // Skip any malformed enrollment records
+                }
             }
         }
-
         return result;
     }
 
-    // return transcript for student
     @GetMapping("/transcripts")
     @PreAuthorize("hasAuthority('SCOPE_ROLE_STUDENT')")
     public List<EnrollmentDTO> getTranscript(Principal principal) {
+        if (principal == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 
-        User student = userRepository.findByEmail(principal.getName());
-        if (student == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "student not found");
-        }
-
-        List<Enrollment> enrollments =
-                enrollmentRepository.findEnrollmentsByStudentIdOrderByTermId(student.getId());
-
+        List<Enrollment> enrollments = enrollmentRepository.findByEmail(principal.getName());
         List<EnrollmentDTO> result = new ArrayList<>();
 
-        for (Enrollment e : enrollments) {
-            result.add(convertToDTO(e));
+        if (enrollments != null) {
+            for (Enrollment e : enrollments) {
+                result.add(convertToDTO(e));
+            }
         }
-
         return result;
     }
 
     private EnrollmentDTO convertToDTO(Enrollment e) {
+        // We use "null-safe" checks for every single nested object
         return new EnrollmentDTO(
                 e.getEnrollmentId(),
                 e.getGrade(),
-                e.getStudent().getId(),
-                e.getStudent().getName(),
-                e.getStudent().getEmail(),
-                e.getSection().getCourse().getCourseId(),
-                e.getSection().getCourse().getTitle(),
-                e.getSection().getSectionId(),
-                e.getSection().getSectionNo(),
-                e.getSection().getBuilding(),
-                e.getSection().getRoom(),
-                e.getSection().getTimes(),
-                e.getSection().getCourse().getCredits(),
-                e.getSection().getTerm().getYear(),
-                e.getSection().getTerm().getSemester()
+                (e.getStudent() != null) ? e.getStudent().getId() : 0,
+                (e.getStudent() != null) ? e.getStudent().getName() : "",
+                (e.getStudent() != null) ? e.getStudent().getEmail() : "",
+                (e.getSection() != null && e.getSection().getCourse() != null) ? e.getSection().getCourse().getCourseId() : "",
+                (e.getSection() != null && e.getSection().getCourse() != null) ? e.getSection().getCourse().getTitle() : "",
+                (e.getSection() != null) ? e.getSection().getSectionId() : 0,
+                (e.getSection() != null) ? e.getSection().getSectionNo() : 0,
+                (e.getSection() != null) ? e.getSection().getBuilding() : "",
+                (e.getSection() != null) ? e.getSection().getRoom() : "",
+                (e.getSection() != null) ? e.getSection().getTimes() : "",
+                (e.getSection() != null && e.getSection().getCourse() != null) ? e.getSection().getCourse().getCredits() : 0,
+                (e.getSection() != null && e.getSection().getTerm() != null) ? e.getSection().getTerm().getYear() : 0,
+                (e.getSection() != null && e.getSection().getTerm() != null) ? e.getSection().getTerm().getSemester() : ""
         );
     }
 }
