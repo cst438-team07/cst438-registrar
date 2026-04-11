@@ -28,7 +28,6 @@ DELETE FROM course;
 DELETE FROM term;
 DELETE FROM user_table;
 
-
 insert into term (term_id, tyear, semester, add_date, add_deadline, drop_deadline, start_date, end_date) values
                                                                                                              (9, 2025, 'Spring', '2024-11-01', '2025-04-30', '2025-04-30', '2025-01-15', '2025-05-17'),
                                                                                                              (10, 2025, 'Fall',  '2025-04-01', '2025-09-30', '2025-09-30', '2025-08-20', '2025-12-17'),
@@ -63,7 +62,6 @@ insert into section (section_no, course_id, section_id, term_id, building, room,
                                                                                                               (2, 'cst599', 1, 11, '10', 'B400', 'F 9-10',    'ted@csumb.edu'),
                                                                                                               (4, 'cst599', 1, 12, '90', 'B104', 'W F 10-11', 'ted@csumb.edu');
 
-
 -- students sama, samb and samc enrolled into cst599-1 Spring 2026
 insert into enrollment (enrollment_id, grade, section_no, user_id) values
                                                                        (1, null, 2, 4),
@@ -79,5 +77,3 @@ insert into enrollment (enrollment_id, grade, section_no, user_id) values
                                                                        (10, null, 4, 4),
                                                                        (11, null, 4, 5),
                                                                        (12, null, 4, 6);
-
-

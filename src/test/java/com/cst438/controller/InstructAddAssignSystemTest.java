@@ -1,4 +1,4 @@
-package controller;
+package com.cst438.controller;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,12 +73,13 @@ public class InstructAddAssignSystemTest {
         // Grade the assignment again and verify the scores.
         // Close the dialog.
 
+        // To dismiss a react-confirm alert
         // wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='react-confirm-alert-button-group']/button[@label='Yes']")));
         // WebElement yesButton = driver.findElement(By.xpath("//div[@class='react-confirm-alert-button-group']/button[@label='Yes']")).click();
 
         Alert alert;
-        int randomString = random.nextInt(100, 1000);
-        String HWName = "HW"+randomString;
+        int randomString = random.nextInt(100000, 999999); // 789423
+        String HWName = "assignment"+randomString;
         // String HWName = "HW dupe name test";
         String courseId = "cst599";
         String courseYear = "2026"; // 2025
@@ -114,7 +115,7 @@ public class InstructAddAssignSystemTest {
 
         // Verify that the new assignment title shows on the assignments page. (AI assisted)
         List<WebElement> titleMatches = driver.findElements(By.xpath("//*[contains(text(),'" + HWName + "')]"));
-        int titleMatchesSize = titleMatches.size();
+        // int titleMatchesSize = titleMatches.size();
         assertTrue(!titleMatches.isEmpty(), HWName + "' not found on page!");
             // Get ID for new assignment to prevent name dupe issues that can happen if the assignment name is
             // already present or the same name is used to create an assignment after this one was graded
