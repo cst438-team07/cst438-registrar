@@ -1,0 +1,153 @@
+package controller;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class InstructAddAssignSystemTest {
+    static final String CHROME_DRIVER_FILE_LOCATION = "C:/Users/IZY2091/Desktop/CST438 Software Engineering/chromedriver-win64/chromedriver.exe";
+
+    static final String URL = "http://localhost:5173";   // react dev server
+
+    static final int DELAY = 1000;
+    WebDriver driver;
+
+    Wait<WebDriver> wait;
+
+    Random random = new Random();
+
+    @BeforeEach
+    public void setUpDriver() throws Exception {
+
+        // set properties required by Chrome Driver
+        System.setProperty(
+                "webdriver.chrome.driver", CHROME_DRIVER_FILE_LOCATION);
+        ChromeOptions ops = new ChromeOptions();
+        ops.addArguments("--remote-allow-origins=*");
+
+        // start the driver
+        driver = new ChromeDriver(ops);
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+        driver.get(URL);
+    }
+    @AfterEach
+    public void quit() {
+        driver.quit();
+    }
+
+    @Test
+    public void instructorAddAssignmentTest() throws InterruptedException {
+        // Reece
+        // instructorAddAssignmentTest.
+
+        // Added to data.sql
+        // Make class 2025 Fall CST599
+        // add 3 users to class as students
+
+        // Done below
+        // Instructor ted@csumb.edu logins.
+        // On the home page for instructor enter 2025 and Fall to view the list of sections.
+        // Select view assignment for the section CST599 and add a new assignment.
+        // Enter a random title and due date for the assignment.
+        // Save the assignment then close the dialog.
+        // Verify that the new assignment title shows on the assignments page.
+        // Select the new assignment for grading.
+        // Enter scores of 60, 88 and 98 for the 3 students enrolled in the section.
+        // Save the grades and close the dialog.
+        // Grade the assignment again and verify the scores.
+        // Close the dialog.
+
+        Alert alert;
+        int randomString = random.nextInt(100, 1000);
+        // String email = "test"+randomInt+"@csumb.edu";
+        String HWName = "HW"+randomString;
+        String courseId = "cst599";
+        String courseYear = "2026"; // 2025
+        String courseSemester = "Fall";
+        String asignDate = "10072026"; // 10072025
+
+        // Instructor ted@csumb.edu logins.
+        driver.findElement(By.id("email")).sendKeys("ted@csumb.edu");
+        driver.findElement(By.id("password")).sendKeys("ted2025");
+        driver.findElement(By.id("loginButton")).click();
+        Thread.sleep(DELAY);
+
+        // On the home page for instructor enter 2025 and Fall to view the list of sections.
+        driver.findElement(By.id("year")).sendKeys(courseYear); // 2025
+        driver.findElement(By.id("semester")).sendKeys(courseSemester); // Fall
+        driver.findElement(By.id("selectTermButton")).click();
+        Thread.sleep(DELAY);
+
+        // Select view assignment for the section CST599 and add a new assignment.
+        driver.findElement(By.xpath("//tr[td[contains(text(), '" + courseId + "')]]//a[contains(text(), 'Assignments')]")).click(); // CST599
+        Thread.sleep(DELAY);
+        driver.findElement(By.id("addAssignmentButton")).click();
+        Thread.sleep(DELAY);
+        driver.findElement(By.xpath("//button[text()='Add Assignment']/following::dialog[1]//input[@name='title']")).sendKeys(HWName);
+        driver.findElement(By.xpath("//button[text()='Add Assignment']/following::dialog[1]//input[@name='dueDate']")).sendKeys(asignDate);
+
+        // Save the assignment then close the dialog.
+        driver.findElement(By.xpath("//button[text()='Add Assignment']/following::dialog[1]//button[contains(text(),'Save')]")).click();
+        Thread.sleep(DELAY);
+        driver.findElement(By.xpath("//button[text()='Add Assignment']/following::dialog[1]//button[contains(text(),'Close')]")).click();
+        Thread.sleep(DELAY);
+
+        // Verify that the new assignment title shows on the assignments page. (AI assisted)
+        List<WebElement> titleMatches = driver.findElements(By.xpath("//*[contains(text(),'" + HWName + "')]"));
+        int titleMatchesSize = titleMatches.size();
+        assertTrue(!titleMatches.isEmpty(), HWName + "' not found on page!");
+
+        // Select the new assignment for grading.
+        driver.findElement(By.xpath("//tr[td[2][contains(text(), '" + HWName + "')]]/td[4]")).click();
+        Thread.sleep(DELAY);
+
+        // Enter scores of 60, 88 and 98 for the 3 students enrolled in the section.
+        List<WebElement> scoreInputs = driver.findElements(
+                By.cssSelector("dialog table input[type='number']")
+        );
+        scoreInputs.get(0).clear(); scoreInputs.get(0).sendKeys("60");
+        scoreInputs.get(1).clear(); scoreInputs.get(1).sendKeys("88");
+        scoreInputs.get(2).clear(); scoreInputs.get(2).sendKeys("98");
+        Thread.sleep(DELAY);
+
+        // Save the grades and close the dialog.
+        driver.findElement(By.xpath("//dialog[@open]//h2[contains(text(),'Grade Assignments')]//following::button[contains(text(),'Save')]")).click();
+        Thread.sleep(DELAY);
+
+        // Grade the assignment again and verify the scores.
+        driver.findElement(By.xpath("//tr[td[2][contains(text(), '" + HWName + "')]]/td[4]")).click();
+        Thread.sleep(DELAY);
+
+        scoreInputs = driver.findElements(
+                By.cssSelector("dialog table input[type='number']")
+        );
+        String score0 = scoreInputs.get(0).getAttribute("value");
+        String score1 = scoreInputs.get(1).getAttribute("value");
+        String score2 = scoreInputs.get(2).getAttribute("value");
+        assertEquals(score0 , "60", "Student 0 Score miss match");
+        assertEquals(score1 , "88", "Student 1 Score miss match");
+        assertEquals(score2 , "98", "Student 2 Score miss match");
+        Thread.sleep(DELAY);
+
+        // Close the dialog.
+        driver.findElement(By.xpath("//dialog[@open]//h2[contains(text(),'Grade Assignments')]//following::button[contains(text(),'Close')]")).click();
+        Thread.sleep(DELAY);
+
+    }
+
+}
