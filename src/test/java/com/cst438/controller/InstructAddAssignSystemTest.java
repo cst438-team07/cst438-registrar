@@ -9,6 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -72,10 +73,13 @@ public class InstructAddAssignSystemTest {
         // Grade the assignment again and verify the scores.
         // Close the dialog.
 
+        // wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='react-confirm-alert-button-group']/button[@label='Yes']")));
+        // WebElement yesButton = driver.findElement(By.xpath("//div[@class='react-confirm-alert-button-group']/button[@label='Yes']")).click();
+
         Alert alert;
         int randomString = random.nextInt(100, 1000);
-        // String email = "test"+randomInt+"@csumb.edu";
         String HWName = "HW"+randomString;
+        // String HWName = "HW dupe name test";
         String courseId = "cst599";
         String courseYear = "2026"; // 2025
         String courseSemester = "Fall";
@@ -85,7 +89,8 @@ public class InstructAddAssignSystemTest {
         driver.findElement(By.id("email")).sendKeys("ted@csumb.edu");
         driver.findElement(By.id("password")).sendKeys("ted2025");
         driver.findElement(By.id("loginButton")).click();
-        Thread.sleep(DELAY);
+        // Thread.sleep(DELAY);
+        wait.until(ExpectedConditions.visibilityOfElementLocated( By.xpath("//*[contains(text(),'Instructor Home')]")));
 
         // On the home page for instructor enter 2025 and Fall to view the list of sections.
         driver.findElement(By.id("year")).sendKeys(courseYear); // 2025
@@ -111,9 +116,12 @@ public class InstructAddAssignSystemTest {
         List<WebElement> titleMatches = driver.findElements(By.xpath("//*[contains(text(),'" + HWName + "')]"));
         int titleMatchesSize = titleMatches.size();
         assertTrue(!titleMatches.isEmpty(), HWName + "' not found on page!");
+            // Get ID for new assignment to prevent name dupe issues that can happen if the assignment name is
+            // already present or the same name is used to create an assignment after this one was graded
+        String assignmentId = driver.findElement(By.xpath("(//tr[td[contains(text(),'" + HWName + "')]])[last()]/td[1]")).getText();
 
         // Select the new assignment for grading.
-        driver.findElement(By.xpath("//tr[td[2][contains(text(), '" + HWName + "')]]/td[4]")).click();
+        driver.findElement(By.xpath("//tr[td[1][text()='" + assignmentId + "']]/td[4]//button")).click();
         Thread.sleep(DELAY);
 
         // Enter scores of 60, 88 and 98 for the 3 students enrolled in the section.
@@ -130,7 +138,8 @@ public class InstructAddAssignSystemTest {
         Thread.sleep(DELAY);
 
         // Grade the assignment again and verify the scores.
-        driver.findElement(By.xpath("//tr[td[2][contains(text(), '" + HWName + "')]]/td[4]")).click();
+        driver.findElement(By.xpath("//tr[td[1][text()='" + assignmentId + "']]/td[4]//button")).click();
+        // driver.findElement(By.xpath("//tr[td[2][contains(text(), '" + HWName + "')]]/td[4]")).click();
         Thread.sleep(DELAY);
 
         scoreInputs = driver.findElements(
