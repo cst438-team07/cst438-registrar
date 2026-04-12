@@ -8,7 +8,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -20,32 +19,22 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InstructAddAssignSystemTest {
-    static final String CHROME_DRIVER_FILE_LOCATION = "C:/Users/IZY2091/Desktop/CST438 Software Engineering/chromedriver-win64/chromedriver.exe";
+    // static final String CHROME_DRIVER_FILE_LOCATION = "C:/Users/..."
 
     static final String URL = "http://localhost:5173";   // react dev server
-
     static final int DELAY = 1000;
     WebDriver driver;
-
     Wait<WebDriver> wait;
-
     Random random = new Random();
 
     @BeforeEach
     public void setUpDriver() throws Exception {
-
-        // set properties required by Chrome Driver
-        System.setProperty(
-                "webdriver.chrome.driver", CHROME_DRIVER_FILE_LOCATION);
-        ChromeOptions ops = new ChromeOptions();
-        ops.addArguments("--remote-allow-origins=*");
-
-        // start the driver
-        driver = new ChromeDriver(ops);
+        driver = new ChromeDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
         wait = new WebDriverWait(driver, Duration.ofSeconds(2));
         driver.get(URL);
     }
+
     @AfterEach
     public void quit() {
         driver.quit();
@@ -149,9 +138,11 @@ public class InstructAddAssignSystemTest {
         String score0 = scoreInputs.get(0).getAttribute("value");
         String score1 = scoreInputs.get(1).getAttribute("value");
         String score2 = scoreInputs.get(2).getAttribute("value");
-        assertEquals(score0 , "60", "Student 0 Score miss match");
-        assertEquals(score1 , "88", "Student 1 Score miss match");
-        assertEquals(score2 , "98", "Student 2 Score miss match");
+
+        assertEquals("60", score0, "Student 0 Score mismatch");  // expected first
+        assertEquals("88", score1, "Student 1 Score mismatch");
+        assertEquals("98", score2, "Student 2 Score mismatch");
+
         Thread.sleep(DELAY);
 
         // Close the dialog.
