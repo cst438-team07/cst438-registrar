@@ -25,7 +25,7 @@ insert into course values
                        ('cst599', 'Independent Study', 3);
 
 insert into section (section_no, course_id, section_id, term_id, building, room, times, instructor_email) values
-                                                                                                              (3, 'cst599', 1, 10, '90', 'B104', 'W F 10-11', 'ted@csumb.edu'),
+                                                                                                           (3, 'cst599', 1, 10, '90', 'B104', 'W F 10-11', 'ted@csumb.edu'),
                                                                                                               (1, 'cst489', 1, 11, '90', 'B104', 'W F 10-11', 'ted@csumb.edu'),
                                                                                                               (5, 'cst334', 1, 11, '90', 'B100', 'T H 10-11', 'ted@csumb.edu'),
                                                                                                               (6, 'cst334', 2, 11, '90', 'B101', 'M W 10-11', 'ted2@csumb.edu'),
