@@ -52,7 +52,7 @@ public class StudentViewAssignmentGradeSystemTest {
         ));
 
         // ---------------------------------------------------------
-        // 2. SELECT TERM (2026 Spring)
+        // 2. SELECT TERM (2026 Fall)
         // ---------------------------------------------------------
         WebElement year = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("year")));
         year.clear();
@@ -60,20 +60,20 @@ public class StudentViewAssignmentGradeSystemTest {
 
         WebElement semester = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("semester")));
         semester.clear();
-        semester.sendKeys("Spring");
+        semester.sendKeys("Fall");
 
         driver.findElement(By.id("selectTermButton")).click();
         Thread.sleep(1000);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//tr/td[2][contains(text(),'cst489')]")
+                By.xpath("//tr/td[2][contains(text(),'cst599')]")
         ));
 
         // ---------------------------------------------------------
         // 3. CLICK Assignments LINK
         // ---------------------------------------------------------
         WebElement assignmentsLink = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//tr[td[2][contains(text(),'cst489')]]//a[@id='assignmentsLink']")
+                By.xpath("//tr[td[2][contains(text(),'cst599')]]//a[@id='assignmentsLink']")
         ));
         assignmentsLink.click();
         Thread.sleep(1000);
@@ -106,7 +106,7 @@ public class StudentViewAssignmentGradeSystemTest {
         titleBox.clear();
         titleBox.sendKeys(title);
 
-        // force update for React-controlled input
+        // use a valid Fall 2026 due date
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript(
                 "const input = arguments[0];" +
@@ -117,7 +117,7 @@ public class StudentViewAssignmentGradeSystemTest {
                         "input.dispatchEvent(new Event('change', { bubbles: true }));" +
                         "input.dispatchEvent(new Event('blur', { bubbles: true }));",
                 dueDateBox,
-                "2026-03-01"
+                "2026-10-20"
         );
 
         System.out.println("Due date field value = " + dueDateBox.getAttribute("value"));
@@ -161,7 +161,7 @@ public class StudentViewAssignmentGradeSystemTest {
         // ---------------------------------------------------------
         WebElement email2 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email")));
         email2.clear();
-        email2.sendKeys("sam@csumb.edu");
+        email2.sendKeys("sam1@csumb.edu");
 
         WebElement password2 = driver.findElement(By.id("password"));
         password2.clear();
@@ -191,7 +191,7 @@ public class StudentViewAssignmentGradeSystemTest {
                 By.id("semester")
         ));
         studentSemester.clear();
-        studentSemester.sendKeys("Spring");
+        studentSemester.sendKeys("Fall");
 
         WebElement getAssignmentsBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//button[contains(text(),'Get Assignments')]")

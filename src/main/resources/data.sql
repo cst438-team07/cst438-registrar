@@ -43,4 +43,8 @@ insert into enrollment (enrollment_id, grade, section_no, user_id) values
                                                                        (6, null, 3, 2),
                                                                        (7, null, 1, 7),
                                                                        (8, null, 5, 7),
-                                                                       (9, null, 3, 7);
+                                                                       (9, null, 3, 7),
+-- Added (3 students enrolled in 2026 Fall CST599) for Reece system test
+                                                                        (10, null, 4, 4),
+                                                                        (11, null, 4, 5),
+                                                                        (12, null, 4, 6);
