@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class StudentViewAssignmentGradeSystemTest {
 
-    private static final String FRONTEND_URL = "http://localhost:5178";
+    private static final String FRONTEND_URL = "http://localhost:5173";
     private WebDriver driver;
     private WebDriverWait wait;
 
