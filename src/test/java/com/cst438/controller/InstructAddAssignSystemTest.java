@@ -26,7 +26,7 @@ public class InstructAddAssignSystemTest {
     Random random = new Random();
 
     @BeforeEach
-    public void setUpDriver(){
+    public void setUpDriver() {
         driver = new ChromeDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
         wait = new WebDriverWait(driver, Duration.ofSeconds(2));
