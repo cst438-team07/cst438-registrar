@@ -18,7 +18,6 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InstructAddAssignSystemTest {
-    // static final String CHROME_DRIVER_FILE_LOCATION = "C:/Users/..."
 
     static final String URL = "http://localhost:5173";   // react dev server
     static final int DELAY = 1000;
