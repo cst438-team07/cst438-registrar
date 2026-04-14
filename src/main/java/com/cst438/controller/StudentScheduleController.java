@@ -1,25 +1,24 @@
 package com.cst438.controller;
 
-import java.security.Principal;
-import java.util.Date;
-import java.util.List;
-
+import com.cst438.domain.*;
+import com.cst438.dto.EnrollmentDTO;
+import com.cst438.dto.SectionDTO;
+import com.cst438.service.GradebookServiceProxy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.cst438.domain.Enrollment;
-import com.cst438.domain.EnrollmentRepository;
-import com.cst438.domain.Section;
-import com.cst438.domain.SectionRepository;
-import com.cst438.domain.User;
-import com.cst438.domain.UserRepository;
-import com.cst438.dto.EnrollmentDTO;
-import com.cst438.service.GradebookServiceProxy;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @RestController
 public class StudentScheduleController {
@@ -41,76 +40,38 @@ public class StudentScheduleController {
         this.gradebook = gradebook;
     }
 
+
     @PostMapping("/enrollments/sections/{sectionNo}")
     @PreAuthorize("hasAuthority('SCOPE_ROLE_STUDENT')")
     public EnrollmentDTO addCourse(
             @PathVariable int sectionNo,
             Principal principal ) throws Exception  {
 
+        // create and save an EnrollmentEntity
+        //  relate enrollment to the student's User entity and to the Section entity
+        //  check that student is not already enrolled in the section
+        //  check that current data is not before addDate, not after addDeadline
         User student = userRepository.findByEmail(principal.getName());
-        if (student == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "student not found");
+        Section s = sectionRepository.findById(sectionNo).orElse(null);
+        if (s==null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "section not found");
         }
-
-        Section section = sectionRepository.findById(sectionNo).orElse(null);
-        if (section == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "section not found");
+        Term t = s.getTerm();
+        Enrollment e = enrollmentRepository.findEnrollmentBySectionNoAndStudentId(sectionNo, student.getId());
+        if (e!=null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "already enrolled");
         }
-
-        List<Enrollment> enrollments =
-                enrollmentRepository.findEnrollmentsByStudentIdOrderByTermId(student.getId());
-
-        for (Enrollment e : enrollments) {
-            if (e.getSection().getSectionNo() == sectionNo) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "already enrolled");
-            }
-        }
-
         Date now = new Date();
-        if (now.before(section.getTerm().getAddDate()) ||
-            now.after(section.getTerm().getAddDeadline())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "not in add period");
+        if (now.after(t.getAddDeadline()) || now.before(t.getAddDate())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "too early or too late to enroll");
         }
 
-        Enrollment e = new Enrollment();
+        e = new Enrollment();
+        e.setSection(s);
         e.setStudent(student);
-        e.setSection(section);
-
         enrollmentRepository.save(e);
-        gradebook.sendMessage("addEnrollment", e);
 
-        return convertToDTO(e);
-    }
-
-    @DeleteMapping("/enrollments/{enrollmentId}")
-    @PreAuthorize("hasAuthority('SCOPE_ROLE_STUDENT')")
-    public void dropCourse(@PathVariable("enrollmentId") int enrollmentId, Principal principal) throws Exception {
-
-        User student = userRepository.findByEmail(principal.getName());
-        if (student == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "student not found");
-        }
-
-        Enrollment e = enrollmentRepository.findById(enrollmentId).orElse(null);
-        if (e == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "enrollment not found");
-        }
-
-        if (e.getStudent().getId() != student.getId()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "not your enrollment");
-        }
-
-        Date now = new Date();
-        if (now.after(e.getSection().getTerm().getDropDeadline())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "drop deadline passed");
-        }
-
-        enrollmentRepository.delete(e);
-        gradebook.sendMessage("dropEnrollment", e);
-    }
-
-    private EnrollmentDTO convertToDTO(Enrollment e) {
-        return new EnrollmentDTO(
+        EnrollmentDTO result = new EnrollmentDTO(
                 e.getEnrollmentId(),
                 e.getGrade(),
                 e.getStudent().getId(),
@@ -127,5 +88,28 @@ public class StudentScheduleController {
                 e.getSection().getTerm().getYear(),
                 e.getSection().getTerm().getSemester()
         );
+        gradebook.sendMessage("addEnrollment", result);
+        return result;
     }
+
+    // student drops a course
+    @DeleteMapping("/enrollments/{enrollmentId}")
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_STUDENT')")
+    public void dropCourse(@PathVariable("enrollmentId") int enrollmentId, Principal principal) throws Exception {
+
+        // check that enrollment belongs to the logged in student
+
+        Enrollment e = enrollmentRepository.findById(enrollmentId).orElse(null);
+        if (e==null || !e.getStudent().getEmail().equals(principal.getName()))  {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid enrollment id");
+        }
+        // check that today is not after dropDeadline
+        Date now = new Date();
+        if (now.after(e.getSection().getTerm().getDropDeadline())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot drop due to date");
+        }
+        enrollmentRepository.delete(e);
+        gradebook.sendMessage("deleteEnrollment", enrollmentId);
+    }
+
 }
